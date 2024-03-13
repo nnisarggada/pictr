@@ -1,0 +1,146 @@
+---
+import Close from "@icons/Close.astro";
+import EmptyHeart from "@icons/EmptyHeart.astro";
+import FilledHeart from "@icons/FilledHeart.astro";
+import Download from "@icons/Download.astro";
+import Delete from "@icons/Delete.astro";
+import Info from "@icons/Info.astro";
+import Share from "@icons/Share.astro";
+import { site } from "@utils";
+
+const { image } = Astro.props;
+
+let date = "";
+
+if (image.tags.CreateDate) {
+  const timestamp = image.tags.CreateDate;
+  const tempDate = new Date(timestamp * 1000);
+
+  date = tempDate.toLocaleDateString("en-IN");
+}
+---
+
+<div
+  id="imageViewer"
+  class="absolute top-0 left-0 z-20 w-full bg-black/90 flex flex-col gap-4 items-center p-4"
+>
+  <div class="w-full flex items-end justify-end py-4">
+    <a
+      href="/"
+      aria-label="Close"
+      class="w-12 aspect-square grid place-items-center text-2xl"
+      data-astro-reload
+    >
+      <Close aria-hidden="true" />
+    </a>
+  </div>
+  <div class="w-full flex-1 flex flex-col justify-center gap-4 p-4">
+    <div class="w-full h-atuo bg-neutral-900 overflow-hidden" id="imageWrapper">
+      <img
+        class="w-full h-auto object-cover"
+        src={image.src}
+        alt={image.filename}
+      />
+    </div>
+    <div class="w-full flex flex-col gap-2">
+      <h1 class="text-3xl font-bold truncate">{image.filename}</h1>
+      <p class="text-sm font-medium">{date}</p>
+    </div>
+    <div class="w-full h-1 bg-primary-600 rounded-full"></div>
+    <div class="w-full flex items-center gap-4">
+      <button
+        id="like"
+        class="scale-100 w-10 aspect-square grid place-items-center text-xl transition-scale duration-300 ease-in-out text-primary-500"
+      >
+        <EmptyHeart aria-hidden="true" />
+      </button>
+      <button
+        id="unlike"
+        class="scale-0 hidden w-10 aspect-square grid place-items-center text-xl transition-scale duration-300 ease-in-out text-primary-500"
+      >
+        <FilledHeart aria-hidden="true" />
+      </button>
+      <button id="download" class="w-10 aspect-square grid place-items-center">
+        <Download aria-hidden="true" />
+      </button>
+      <button
+        id="delete"
+        class="w-10 aspect-square grid place-items-center text-rose-500"
+      >
+        <Delete aria-hidden="true" />
+      </button>
+      <button id="info" class="w-10 aspect-square grid place-items-center">
+        <Info />
+      </button>
+      <button
+        id="share"
+        class="w-10 aspect-square grid place-items-center mx-auto mr-0"
+      >
+        <Share />
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  #imageViewer {
+    height: 100vh;
+    height: 100svh;
+    height: -webkit-fill-available;
+  }
+</style>
+
+<script define:vars={{ site }}>
+  document.body.style.overflow = "hidden";
+
+  const fileName = window.location.pathname.split("/").pop();
+
+  const likeBtn = document.getElementById("like");
+  const unlikeBtn = document.getElementById("unlike");
+
+  likeBtn.addEventListener("click", () => {
+    likeBtn.classList.add("scale-0");
+    likeBtn.classList.remove("scale-100");
+    setTimeout(() => {
+      likeBtn.classList.add("hidden");
+      unlikeBtn.classList.remove("hidden");
+      unlikeBtn.classList.remove("scale-0");
+      unlikeBtn.classList.add("scale-100");
+    }, 300);
+  });
+
+  unlikeBtn.addEventListener("click", () => {
+    unlikeBtn.classList.add("scale-0");
+    unlikeBtn.classList.remove("scale-100");
+    setTimeout(() => {
+      unlikeBtn.classList.add("hidden");
+      likeBtn.classList.remove("hidden");
+      likeBtn.classList.remove("scale-0");
+      likeBtn.classList.add("scale-100");
+    }, 300);
+  });
+
+  const shareBtn = document.getElementById("share");
+  shareBtn.addEventListener("click", async () => {
+    const res = await fetch("/api/share?fileName=" + fileName, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => res);
+
+    const url = site + "/shared/" + res;
+
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        alert("Text copied to clipboard: " + url);
+      })
+      .catch((err) => {
+        console.error("Error in copying: ", err);
+        alert("Error in copying: " + err);
+      });
+  });
+</script>

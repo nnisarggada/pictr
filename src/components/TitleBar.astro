@@ -1,0 +1,17 @@
+---
+import Menu from "@icons/Menu.astro";
+import { name } from "@utils";
+---
+
+<header class="w-full h-24 border-b-neutral-700 flex flex-col gap-4 p-4">
+  <div class="w-full h-24 border-b-neutral-700 flex items-end justify-between">
+    <div class="w-5/6 h-full flex flex-col justify-between">
+      <h2 class="text-sm text-primary-500 font-black">PICTR</h2>
+      <h1 class="text-3xl font-bold truncate">{name}</h1>
+    </div>
+    <button class="w-12 aspect-square flex items-center justify-center">
+      <Menu />
+    </button>
+  </div>
+  <div class="w-full min-h-1 bg-primary-600 rounded-full"></div>
+</header>

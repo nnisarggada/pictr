@@ -1,0 +1,41 @@
+---
+import Base from "@layouts/Base.astro";
+import { name } from "@utils";
+import TitleBar from "@components/TitleBar.astro";
+import Gallery from "@components/Gallery.astro";
+import ImageViewer from "@components/ImageViewer.astro";
+
+const pid = Astro.params.pid;
+
+const url = "http://localhost:4321/api/find?fileName=" + pid;
+
+const res = await fetch(url, {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+  },
+})
+  .then((res) => res.json())
+  .then((res) => res);
+
+const image = {
+  src: `data:image/jpeg;base64,${res.data}`,
+  filename: res.filename,
+  tags: res.tags,
+};
+---
+
+<Base title={`${pid} - ${name} | PICTR`}>
+  <TitleBar />
+  <div class="w-full h-full p-4">
+    <Gallery />
+  </div>
+  <ImageViewer image={image} />
+</Base>
+
+<script>
+  document.body.style.overflow = "hidden";
+</script>
+document.body.style.overflow = "hidden"; document.body.style.overflow = "hidden";
+document.body.style.overflow = "hidden";
+
